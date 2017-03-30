@@ -1,0 +1,72 @@
+#lang racket
+;eight queens
+(define (accumulate op init seq)
+  (if (null? seq)
+      init
+      (cons (op (car seq))
+            (accumulate op init (cdr seq)))))
+(define (checkrow lst);ni代表第i列中的皇后的个数
+  (if (eq? (accumulate + 0 lst) 36)
+      #t
+      #f))
+(define (listn lst i)
+  (if (= i 1)
+      (car lst)
+      (listn (cdr lst) (- i 1))))
+(define (checkdiagnal lst)
+  (define (checkloop i j)
+    (cond((> i 8)#t)
+          ((> j 8) (set! j (+ i 2))(checkloop (+ i 1) j))
+          ((or
+            (eq? (-(listn lst j)(listn lst i)) (- j i))
+            (eq? (-(listn lst j)(listn lst i)) (- i j))) #f)
+          (else (checkloop i (+ j 1)))))
+  (checkloop 1 2))
+(define (check rlist);检查列 和 对角线；列：取出每一位元素的值，8为数组，分别代表1到8，将对应值的个数+1；所得结果相乘，如果存在==0，则不成功
+ ;查对角线：如果行之差的绝对值==列之差的绝对值，则不成功。
+(if (and (checkrow rlist)
+         (checkdiagnal rlist))
+    #t
+    #f))
+(define (next lst)
+    (define v8 (listn lst 8))
+  (define (update i)
+    (define vi (listn lst i))
+    (define vii (listn lst (- i 1)))
+    (if (< i 1)
+        void
+    (if(> vi 8)
+        (begin(set! vi 1)
+             (set! vii (+ vii 1))
+             (update (- i 1)))
+        void)))
+  (set! v8 (+ (listn lst 8) 1))
+  (update 8)
+  lst)
+
+(define (try-next lst)
+  (if (check lst);检查当前的n是否满足条件
+      lst
+      ((displayln lst)
+       (try-next (next lst)))));(next n 表示下一个可能的布局，直接用八进制表示可能会简单一些)
+
+(define (queenarray-n i)
+  (define init (try-next (list 1 2 3 4 5 6 7 8)))
+  (if(= i 1);给出初始值
+     init
+     (try-next (next (queenarray-n (- i 1))))))
+
+(define (find)
+  (define n (read))
+  (displayln (queenarray-n n)))
+
+(define (myfor times op)
+  (if (= times 0)
+      void
+      ((op)
+       (myfor (- times 1) op))))
+
+(define (myloop)
+  (define t (read))
+  (myfor t find))
+(myloop)
