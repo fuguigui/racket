@@ -1,0 +1,20 @@
+#lang racket
+(define (a l r)
+  (if (or (= r 1)(= r l))
+      1
+      (+ (a (- l 1) r) (a (- l 1)(- r 1)))));每次都要递归计算输出项的值，太慢了。。。如何快一些呢？有公式么？？？
+(define (for2 line now)
+  (if(> now line)
+     void
+     (begin (display (a line now))(for2 line (+ now 1))(void))))
+(define (for1 nline now)
+  (if (> now nline)
+      void
+      (begin (for2 now 1)(newline)(for1 nline (+ now 1))(void))))
+  
+(define (loop)
+  (define lines (read))
+    (if (eq? lines eof)
+        (void)
+        (begin (for1 lines 1)(loop)(void))))
+(loop)
