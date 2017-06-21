@@ -1,0 +1,76 @@
+#lang racket
+;16-d 流函数partial-sums-ex
+(require r5rs)
+(define env (scheme-report-environment 5))
+(eval '(define (stream-car stream) (car stream)) env)
+(eval '(define (stream-cdr stream) (force (cdr stream))) env)
+(eval '(define-syntax cons-stream
+  (syntax-rules ()
+    [(cons-stream x y) (cons x (delay y))])) env)
+
+(eval '(define the-empty-stream '()) env)
+(eval '(define (stream-null? stream) (null? stream)) env)
+         
+(eval '(define (stream-ref s n)  ;get the nth item from s. n starts from 
+  (if (stream-null? s) the-empty-stream
+      (if (= n 0)
+          (stream-car s)
+          (stream-ref (stream-cdr s) (- n 1)))))
+      env)
+
+(eval '(define (display-stream s n) ;display first n items of s
+  (if (= n 0)
+      (displayln "")
+      (begin (display (stream-car s)) (display " ") (display-stream (stream-cdr s) (- n 1)))))
+      env)
+
+
+(eval '
+      ;-----------补充部分
+(define (partial-sums-ex op s)
+  (define (op-streams op s1 s2)
+    (cons-stream (op (stream-car s1)
+                     (stream-car s2))
+                 (op-streams op (stream-cdr s1)
+                             (stream-cdr s2))))
+(define tmps
+  (cons-stream (stream-ref s 0)
+               (cons-stream (stream-ref s 1)
+                            (op-streams op
+                                        tmps
+                                        (stream-cdr (stream-cdr s))))))
+  tmps)
+  
+;--------------补充结束----------------
+    env)
+
+    (define (myloop)
+      (define (eval-codes codes last-val)
+        (if (null? codes)
+            last-val
+            (eval-codes (cdr codes) (eval (car codes) env))))
+        
+      (let ((codes (read)))
+        (if (eq? codes eof)
+            (void)
+            (begin (displayln (eval-codes codes (void))) (myloop)))))
+    (myloop)
+
+ #|
+样例输入
+(
+ (define (displayln x) (display x) (newline))
+ (define (integers-starting-from n)
+  (cons-stream n (integers-starting-from (+ n 1))))
+
+(define ones (cons-stream 1 ones))
+
+(display-stream (partial-sums-ex + (integers-starting-from 1)) 10)
+'ok
+)
+|#
+#|
+;样例输出
+1 2 4 6 9 12 16 20 25 30 
+ok
+|#
