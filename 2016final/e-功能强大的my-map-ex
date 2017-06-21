@@ -1,0 +1,26 @@
+#lang racket
+;功能强大的my-map-ex
+(require r5rs)
+
+(define env (scheme-report-environment 5))
+(eval  ;only after evaluating your my-map-ex, the program in the input can use my-map-ex
+ '
+(define (my-map-ex proc . args)
+
+// 在此处补充你的代码
+
+    env)
+
+    (define (myloop)
+      (let ((codes (read)))
+        (if (eq? codes eof)
+            (void)
+            (begin  (displayln (eval codes env)) (myloop)))))
+
+
+    (myloop)
+ #|
+(my-map-ex + (list 1 2 ) (list 3 4 5) (list 6 7 8 9) (list 10))
+(my-map-ex + )
+
+|#
