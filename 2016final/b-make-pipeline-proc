@@ -1,0 +1,26 @@
+#lang racket
+;16-b make-pipline-proc
+(require r5rs)
+
+(define env (scheme-report-environment 5))
+(eval  ;only after evaluating this function, the program in the input can use it
+ '
+(define (make-pipeline-proc . arg)
+  (define (list-version arg)
+    (lambda(x)
+      (if(null? arg)
+         x
+         ((list-version (cdr arg))((car arg) x)))))
+  (list-version arg))
+
+env)  
+(define (myloop)
+  (let ((codes (read)))
+    (if (eq? codes eof)
+        (void)
+        (let ((result (eval codes env)))
+          (if (eq? (void) result)
+              (myloop)
+              (begin (displayln result) (myloop)))))))
+              
+(myloop)
