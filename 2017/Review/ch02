@@ -1,0 +1,67 @@
+#lang racket
+;期末复习 2017年6月13日 晚7:50 伏贵荣
+(define (accumulate op initial sequence)
+  (if(null? sequence)
+     initial
+     (op (car sequence)
+         (accumulate op initial (cdr sequence)))))
+(define (fib n)
+  (define (fib-iter a b count)
+    (if(= count 0)
+       b
+       (fib-iter (+ a b) a (- count 1))))
+  (fib-iter 1 0 n))
+#|(fib 4)
+(fib 5)
+(fib 6)
+(fib 7)|#
+(define (enumerate-interval begin end)
+  (if(> begin end)
+     '()
+     (cons begin
+           (enumerate-interval (+ begin 1) end))))
+(define (filter predicate sequence)
+  (cond((null? sequence)'())
+       ((predicate (car sequence))
+        (cons (car sequence)
+              (filter predicate (cdr sequence))))
+       (else (filter predicate (cdr sequence)))))
+(define (square x)
+  (* x x))
+(define (even-fibs n)
+  (accumulate + 0 (filter even? (map fib (enumerate-interval 1 n)))))
+(define (square-fibs n)
+  (accumulate + 0 (map square (map fib (enumerate-interval 1 n)))))
+;(square-fibs 10)
+
+;求一个序列中所有奇数的平方的乘积
+(define (product-of-odd-item sequence)
+  (accumulate * 1 (map square(filter odd? sequence))))
+;(product-of-odd-item (list 1 2 3 4 5))
+
+
+;生成所有的对子的列表，对子满足：1<=j<i<=n
+(define (flatmap proc sequence)
+  (if(null? sequence)
+     '()
+     (append (proc (car sequence))
+                     (flatmap proc (cdr sequence)))))
+(define (make-pairs n)
+ (flatmap (lambda (i)
+    (map (lambda (x)
+         (list i x))
+       (enumerate-interval 1 (- i 1))))
+      (enumerate-interval 1 n)))
+;make-pairs 6)
+
+;生成全排列的算法
+(define (remove x seq)
+  (filter (lambda (a) (not (= a x ))) seq))
+(define (permutation s)
+  (if (null? s)
+      (list'())
+      (flatmap
+       (lambda (x)(map (lambda (a) (cons x a))
+           (permutation (remove x s))))
+       s)))
+(permutation (enumerate-interval 2 4))
