@@ -1,0 +1,32 @@
+#lang racket
+;多重循环的复合函数
+(define (square x) (* x x))
+(define (inc x) (+ x 1))
+(define (db x) (* x 2))
+
+(define (combine f1 f2 n)
+  (define g (lambda (x) (f1 (f2 x))))
+  (define (iter func x times)
+    (if( =  times 0)
+       x
+       (iter func (func x) (- times 1))))
+  (lambda (x)
+    (iter g x n)))
+
+
+((combine square inc 1) 2)
+((combine square inc 2) 3)
+((combine db inc 3) 2)
+((combine inc inc 4) 3)
+
+(display "********") (newline)
+
+(define (myloop)
+  (let ((n (read))
+        (x (read)))
+    (if (eq? n eof)
+        (void)
+        (begin (display ((combine inc square n) x)) 
+               (newline) (myloop)))))
+
+(myloop)
