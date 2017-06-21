@@ -1,0 +1,32 @@
+#lang racket
+(define (order set)
+  ;对给定的set按照从小到大排序，并求出所有的子集
+  (if(null? set)
+     '()
+     (if(null? (cdr set))
+        set
+        (let((cur (car set))
+             (done (order (cdr set))))
+          (if(< cur (car done))
+             (cons cur done)
+             (cons (car done)
+                 (order (cons cur (cdr done)))))))))
+(define (get-notnone-subset set)
+  (if (null? set)
+      '()
+      (append
+       (map (lambda (x)(cons (car set) x))
+           (get-all-subset (cdr set)))
+       (get-notnone-subset (cdr set)))))
+(define (get-all-subset set)
+  (cons '() (get-notnone-subset set)))
+(define (get-all-order-subset set)
+  (get-all-subset (order set)))
+(define (main)
+  (define set(read))
+  (if (eq? set eof)
+      (void)
+      (begin
+        (displayln (get-all-order-subset set))
+        (main))))
+(main)

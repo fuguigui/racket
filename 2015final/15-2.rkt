@@ -1,0 +1,33 @@
+#lang racket
+;超级斐波那契数列
+(define (my-iter func times)
+    (func)
+    (if (= times 0)
+        null
+        (my-iter func (- times 1))))
+(define (super-fib n)
+  (let((a0 1)
+       (a1 1)
+       (a2 1)
+       (a3 1)
+       (a4 1))
+    (define (sub-fib)
+         (define result (+ a4 (* 4 a3) (* 5 a2) (- 0 (* 2 a1 a1))
+                             (* a0 a0 a0)))
+           (set! a0 a1)
+           (set! a1 a2)
+           (set! a2 a3)
+           (set! a3 a4)
+           (set! a4 result))
+    (if (< n 5)
+        1
+        (my-iter sub-fib (- n 5)))
+    a4))
+(define (main-loop)
+  (define n (read))
+  (if(eq? n eof)
+     (void)
+     (begin
+       (displayln(super-fib n))
+       (main-loop))))
+(main-loop)
