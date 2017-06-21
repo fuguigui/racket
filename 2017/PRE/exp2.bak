@@ -1,0 +1,4 @@
+#lang racket
+(require 2htdp/image)
+(require 2htdp/planetcute)
+(save-image character-horn-girl "/planetcute/horn-girl.bmp")
