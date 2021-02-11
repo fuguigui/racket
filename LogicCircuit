@@ -6,8 +6,7 @@
 (define set-car! set-mcar!)
 (define set-cdr! set-mcdr!)
 (define cons mcons)
-;这个版本存在问题。。
-;在add-to-agent
+
 ;队列的实现
 (define (make-que) (cons '() '()))
 (define (front-ptr queue) (car queue))
@@ -60,28 +59,18 @@
     (let ((q (make-que)))
           (insert-que! q action)
           (make-time-segment time q)))
-  (define (add-to-segment! segments before)
-      (cond((belongs-before? segments)
-            (set-cdr! before (cons (make-new-time-segment time action) segments)))
-           ((=(segment-time (car segments)) time)
-            (insert-que! (segment-que (car segments)) action))
-           (else
-            (add-to-segment! (cdr segments) (car segments)))))
-  ;  (cond ((null? segments)
-   ;        (begin
-    ;         (display "time:")(display time)(display "segments are null")(newline)
-     ;        (set-cdr! agenda (cons (make-new-time-segment time action)'()))))
-      ;    ((= (segment-time (car segments))time ) 
-       ;    (begin(display "time:")(display time)(display "insert in the current segment")(newline)
-        ;         (insert-que! (segment-que (car segments)) action)))
-         ; (else
-          ; (let ((rest (cdr segments)))
-           ;  (if (belongs-before? rest)
-            ;  (begin(display "time:")(display time)(display "in the before segments")(newline)
-             ;       (set-cdr! segments (cons (make-new-time-segment time action)
-              ;                         (cdr segments))))
-              ;(add-to-segment! rest))))))
-  (add-to-segment! (segments agenda) agenda))
+  (define (add-to-segments! segments)
+    (if ( = (segment-time (car segments) )time )
+        (insert-que! (segment-que (car segments)) action)
+        (let((rest (cdr segments)))
+          (if(belongs-before? rest)
+             (set-cdr! segments (cons (make-new-time-segment time action)
+                                      (cdr segments)))
+             (add-to-segments! rest)))))
+  (let ((segments (segments agenda)))
+    (if(belongs-before? segments)
+       (set-segments! agenda (cons (make-new-time-segment time action)segments))
+       (add-to-segments! segments))))
 (define (remove-first-agenda-item! agenda)
     (let ((q (segment-que (first-segment agenda))))
       (delete-que! q)
@@ -102,19 +91,6 @@
 
 ;一些操作
 (define (propagate)
-  (define (agenda-display the-agenda)
-    (display "cur time: ")
-    (display (car the-agenda))
-    (newline)
-    (define (loop-display-seg segs)
-      (if (null? segs)
-          'done
-          (begin(display "the segment time:")
-            (display (car (car segs)))
-            (newline)
-            (loop-display-seg (cdr segs)))))
-    (loop-display-seg (cdr the-agenda)))
-  (agenda-display the-agenda)
   (if(empty-agenda? the-agenda)
      'done-agenda-is-empty
      (let((first-item (first-agenda-item the-agenda)))
